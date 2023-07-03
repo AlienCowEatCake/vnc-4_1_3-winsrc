@@ -32,6 +32,8 @@
 
 namespace rfb {
 
+  class Condition;
+
   class Mutex {
   public:
     Mutex() {

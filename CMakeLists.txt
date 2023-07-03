@@ -8,9 +8,11 @@ check_cpu_arch_x64(CPU_IS_X64)
 check_cpu_arch_arm32(CPU_IS_ARM32)
 check_cpu_arch_arm64(CPU_IS_ARM64)
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /GS-")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /GS-")
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /GS-")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /GS-")
+endif()
 
 include_directories(
     "${CMAKE_CURRENT_LIST_DIR}/common/zlib"
