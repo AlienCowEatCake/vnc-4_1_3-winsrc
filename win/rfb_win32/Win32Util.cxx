@@ -70,7 +70,7 @@ const TCHAR* FileVersionInfo::getVerString(const TCHAR* name, DWORD langId) {
   TCHAR* buffer = 0;
   UINT length = 0;
   if (!VerQueryValue(buf, infoName.buf, (void**)&buffer, &length)) {
-    printf("unable to find %s version string", CStr(infoName.buf));
+    printf("unable to find %s version string", (const char*)CStr(infoName.buf));
     throw rdr::Exception("VerQueryValue failed");
   }
   return buffer;
