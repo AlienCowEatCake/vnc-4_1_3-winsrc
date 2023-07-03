@@ -1,0 +1,459 @@
+cmake_minimum_required(VERSION 3.15)
+
+project(RealVNC VERSION 4.1.3 LANGUAGES C CXX)
+
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /GS-")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Ox /GS-")
+
+include_directories(
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib"
+    "${CMAKE_CURRENT_LIST_DIR}/common"
+    "${CMAKE_CURRENT_LIST_DIR}/win"
+)
+add_compile_definitions(
+    "WIN32"
+    "_WINDOWS"
+    "UNICODE"
+    "_UNICODE"
+    "_CRT_SECURE_NO_WARNINGS"
+    "_WINSOCK_DEPRECATED_NO_WARNINGS"
+    "_WINSOCKAPI_" # Prevent inclusion of winsock.h in windows.h
+)
+
+add_library(
+    network
+    STATIC
+    "${CMAKE_CURRENT_LIST_DIR}/common/network/TcpSocket.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/network/Socket.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/network/TcpSocket.h"
+)
+
+add_library(
+    rdr
+    STATIC
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/Exception.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/FdInStream.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/FdOutStream.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/HexInStream.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/HexOutStream.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/InStream.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/RandomStream.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/ZlibInStream.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/ZlibOutStream.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/Exception.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/FdInStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/FdOutStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/FixedMemOutStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/HexInStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/HexOutStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/InStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/MemInStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/MemOutStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/msvcwarning.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/OutStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/RandomStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/SubstitutingInStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/types.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/ZlibInStream.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rdr/ZlibOutStream.h"
+)
+
+add_library(
+    Xregion
+    STATIC
+    "${CMAKE_CURRENT_LIST_DIR}/common/Xregion/Region.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/Xregion/region.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/Xregion/Xregion.h"
+)
+
+add_library(
+    rfb
+    STATIC
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Blacklist.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CConnection.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgHandler.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgReader.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgReaderV3.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgWriter.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgWriterV3.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ComparingUpdateTracker.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Configuration.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ConnParams.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CSecurityVncAuth.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Cursor.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/d3des.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Decoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Encoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/encodings.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/HextileDecoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/HextileEncoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/HTTPServer.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/KeyRemapper.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Logger.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Logger_file.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Logger_stdio.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/LogWriter.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Password.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/PixelBuffer.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/PixelFormat.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/RawDecoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/RawEncoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Region.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/RREDecoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/RREEncoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SConnection.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/secTypes.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ServerCore.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgHandler.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgReader.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgReaderV3.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgWriter.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgWriterV3.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SSecurityFactoryStandard.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SSecurityVncAuth.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/TransImageGetter.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/UpdateTracker.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/util.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/VNCSConnectionST.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/VNCServerST.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ZRLEDecoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ZRLEEncoder.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Blacklist.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CConnection.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgHandler.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgReader.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgReaderV3.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgWriter.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CMsgWriterV3.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ColourCube.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ColourMap.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ComparingUpdateTracker.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Configuration.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ConnParams.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CSecurity.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CSecurityNone.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/CSecurityVncAuth.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Cursor.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/d3des.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Decoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Encoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/encodings.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Exception.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/hextileConstants.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/hextileDecode.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/HextileDecoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/hextileEncode.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/HextileEncoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Hostname.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/HTTPServer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ImageGetter.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/InputHandler.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/KeyRemapper.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/keysymdef.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Logger.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Logger_file.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Logger_stdio.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/LogWriter.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/msgTypes.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Password.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Pixel.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/PixelBuffer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/PixelFormat.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/RawDecoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/RawEncoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Rect.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Region.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/rreDecode.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/RREDecoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/rreEncode.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/RREEncoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SConnection.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SDesktop.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/secTypes.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ServerCore.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgHandler.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgReader.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgReaderV3.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgWriter.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SMsgWriterV3.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SSecurity.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SSecurityFactoryStandard.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SSecurityNone.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/SSecurityVncAuth.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/Threading.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/TransImageGetter.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/transInitTempl.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/transTempl.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/TrueColourMap.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/UpdateTracker.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/UserPasswdGetter.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/util.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/VNCSConnectionST.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/VNCServer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/VNCServerST.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/zrleDecode.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ZRLEDecoder.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/zrleEncode.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/rfb/ZRLEEncoder.h"
+)
+
+add_library(
+    zlib
+    STATIC
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/adler32.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/compress.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/crc32.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/deflate.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/gzio.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/infblock.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/infcodes.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/inffast.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/inflate.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/inftrees.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/infutil.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/trees.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/uncompr.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/zutil.c"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/deflate.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/infblock.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/infcodes.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/inffast.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/inffixed.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/inftrees.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/infutil.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/trees.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/zconf.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/zlib.h"
+    "${CMAKE_CURRENT_LIST_DIR}/common/zlib/zutil.h"
+)
+
+add_library(
+    rfb_win32
+    STATIC
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/AboutDialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CKeyboard.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CleanDesktop.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Clipboard.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CPointer.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CurrentUser.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/DeviceContext.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/DeviceFrameBuffer.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Dialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/DIBSectionBuffer.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/DynamicFn.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/EventManager.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/LaunchProcess.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/LowLevelKeyEvents.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/MonitorInfo.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/MsgWindow.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/OSVersion.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/RegConfig.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Registry.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SDisplay.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SDisplayCorePolling.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SDisplayCoreWMHooks.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Security.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Service.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SInput.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SocketManager.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/TCharArray.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Threading.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/TsSessions.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Win32Util.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMCursor.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMHooks.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMNotifier.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMPoller.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMShatter.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMWindowCopyRect.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/AboutDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/BitmapInfo.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CKeyboard.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CleanDesktop.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Clipboard.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CompatibleBitmap.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/ComputerName.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CPointer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/CurrentUser.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/DeviceContext.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/DeviceFrameBuffer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Dialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/DIBSectionBuffer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/DynamicFn.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/EventManager.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Handle.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/IconInfo.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/IntervalTimer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/keymap.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/LaunchProcess.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/LocalMem.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/LogicalPalette.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/LowLevelKeyEvents.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/ModuleFileName.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/MonitorInfo.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/MsgBox.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/MsgWindow.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/OSVersion.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/RegConfig.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Registry.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SDisplay.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SDisplayCoreDriver.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SDisplayCorePolling.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SDisplayCoreWMHooks.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Security.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Service.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SInput.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/SocketManager.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/TCharArray.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Threading.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/TrayIcon.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/TsSessions.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/Win32Util.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMCursor.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMHooks.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMNotifier.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMPoller.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMShatter.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/rfb_win32/WMWindowCopyRect.h"
+)
+
+add_executable(
+    vncconfig
+    WIN32
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/Legacy.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/PasswordDialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/vncconfig.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/Authentication.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/Connections.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/Desktop.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/Hooking.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/Inputs.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/Legacy.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/PasswordDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/resource.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/Sharing.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/vncconfig.rc"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncconfig/vncconfig.exe.manifest"
+)
+target_link_libraries(
+    vncconfig
+    PUBLIC
+    network
+    rdr
+    rfb
+    Xregion
+    zlib
+    rfb_win32
+    ws2_32
+    version
+    comctl32
+)
+
+add_executable(
+    vncviewer
+    WIN32
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/buildTime.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/CConn.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/CConnOptions.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/CConnThread.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/ConnectingDialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/ConnectionDialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/DesktopWindow.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/InfoDialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/OptionsDialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/UserPasswdDialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/vncviewer.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/CConn.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/CConnOptions.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/CConnThread.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/ConnectingDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/ConnectionDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/DesktopWindow.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/InfoDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/ListenServer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/ListenTrayIcon.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/MRU.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/OptionsDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/UserPasswdDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/vncviewer.rc"
+    "${CMAKE_CURRENT_LIST_DIR}/win/vncviewer/vncviewer.exe.manifest"
+)
+target_link_libraries(
+    vncviewer
+    PUBLIC
+    network
+    rdr
+    rfb
+    Xregion
+    zlib
+    rfb_win32
+    ws2_32
+    version
+    comctl32
+)
+
+add_executable(
+    winvnc4
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/buildTime.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/JavaViewer.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/ManagedListener.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/QueryConnectDialog.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/STrayIcon.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/VNCServerService.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/VNCServerWin32.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/winvnc.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/AddNewClientDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/JavaViewer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/ManagedListener.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/QueryConnectDialog.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/STrayIcon.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/VNCServerService.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/VNCServerWin32.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/winvnc.rc"
+    "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/winvnc4.exe.manifest"
+)
+target_link_libraries(
+    winvnc4
+    PUBLIC
+    network
+    rdr
+    rfb
+    Xregion
+    zlib
+    rfb_win32
+    ws2_32
+    version
+    comctl32
+)
+
+add_library(
+    wm_hooks
+    SHARED
+    "${CMAKE_CURRENT_LIST_DIR}/win/wm_hooks/wm_hooks.cxx"
+    "${CMAKE_CURRENT_LIST_DIR}/win/wm_hooks/wm_hooks.def"
+    "${CMAKE_CURRENT_LIST_DIR}/win/wm_hooks/wm_hooks.h"
+    "${CMAKE_CURRENT_LIST_DIR}/win/wm_hooks/wm_hooks.rc"
+)
+target_compile_definitions(
+    wm_hooks
+    PRIVATE
+    "_USRDLL"
+    "WM_HOOKS_EXPORTS"
+)
+
+install(
+    TARGETS
+    vncconfig
+    vncviewer
+    winvnc4
+    wm_hooks
+    RUNTIME DESTINATION .
+)
+
+string(REPLACE "." "_" VNC_PACKAGE_VERSION "${CMAKE_PROJECT_VERSION}")
+
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_PACKAGE_FILE_NAME "vnc-${VNC_PACKAGE_VERSION}-x86_win32")
+set(CPACK_STRIP_FILES TRUE)
+include(CPack)

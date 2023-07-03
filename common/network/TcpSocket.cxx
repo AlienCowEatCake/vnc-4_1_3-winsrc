@@ -18,6 +18,7 @@
 
 #ifdef WIN32
 //#include <io.h>
+#include <stdio.h>
 #include <winsock2.h>
 #define errorNumber WSAGetLastError()
 #define snprintf _snprintf

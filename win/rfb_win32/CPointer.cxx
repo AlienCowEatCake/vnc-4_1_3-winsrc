@@ -54,7 +54,8 @@ void CPointer::pointerEvent(InputHandler* writer, const Point& pos, int buttonMa
 }
 
 
-inline abs(int x) {return x>0 ? x : 0;}
+#define abs abs_rfb
+inline int abs(int x) {return x>0 ? x : 0;}
 
 int emulate3Mask(int buttonMask) {
   // - Release left & right and press middle
