@@ -403,8 +403,7 @@ target_link_libraries(
     comctl32
 )
 
-add_executable(
-    winvnc4
+set(WINVNC_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/buildTime.cxx"
     "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/JavaViewer.cxx"
     "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/ManagedListener.cxx"
@@ -423,9 +422,7 @@ add_executable(
     "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/winvnc.rc"
     "${CMAKE_CURRENT_LIST_DIR}/win/winvnc/winvnc4.exe.manifest"
 )
-target_link_libraries(
-    winvnc4
-    PUBLIC
+set(WINVNC_LIBRARIES
     network
     rdr
     rfb
@@ -436,6 +433,32 @@ target_link_libraries(
     version
     comctl32
 )
+add_executable(
+    winvnc4
+    ${WINVNC_SOURCES}
+)
+target_link_libraries(
+    winvnc4
+    PUBLIC
+    ${WINVNC_LIBRARIES}
+)
+add_executable(
+    winvnc4w
+    WIN32
+    ${WINVNC_SOURCES}
+)
+target_link_libraries(
+    winvnc4w
+    PUBLIC
+    ${WINVNC_LIBRARIES}
+)
+if(MSVC)
+    target_link_options(
+        winvnc4w
+        PRIVATE
+        "/ENTRY:mainCRTStartup"
+    )
+endif()
 
 add_library(
     wm_hooks
@@ -457,6 +480,7 @@ install(
     vncconfig
     vncviewer
     winvnc4
+    winvnc4w
     wm_hooks
     RUNTIME DESTINATION .
 )
